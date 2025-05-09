@@ -12,6 +12,36 @@
 #include "setup_ib.h"
 #include "helper.h"
 
+int post_recv1(int size)
+{
+    struct ibv_sge list[2];
+    list[0].addr = (uint64_t)ib_res.buf;
+    list[0].length = 3;
+    list[0].lkey = ib_res.mr->lkey;
+    list[1].lkey = ib_res.mr->lkey;
+    list[1].length = 4;
+    list[1].addr = (uint64_t)ib_res.buf+3;
+
+    // struct ibv_recv_wr *bad_wr, wr = {
+    //     .wr_id	    = RECV_WRID,
+    //     .sg_list    = list,
+    //     .num_sge    = 2,
+    //     .next       = NULL
+    // };
+    struct ibv_recv_wr *bad_wr;
+    struct ibv_recv_wr wr[2];
+    wr[0].wr_id = RECV_WRID;
+    wr[0].sg_list = &list[0];
+    wr[0].num_sge = 1;
+    wr[0].next = &wr[1];
+    wr[1].wr_id = RECV_WRID;
+    wr[1].sg_list = &list[1];
+    wr[1].num_sge = 1;
+    wr[1].next = NULL;
+
+    ibv_post_recv(ib_res.qp, wr, &bad_wr);
+}
+
 int post_recv(int size)
 {
     struct ibv_sge list = {
@@ -97,6 +127,41 @@ int post_send_write(struct RemoteMR remote_mr, int size)
 int wait_completions(int wr_id)
 {
     int finished = 0, count = 1;
+
+    while (finished < count)
+    {
+        struct ibv_wc wc[WC_BATCH];
+        int n;
+        do {
+            n = ibv_poll_cq(ib_res.cq, WC_BATCH, wc);
+
+            if (n < 0)
+            {
+                fprintf(stderr, "Poll CQ failed %d\n", n);
+                return 1;
+            }
+        } while (n < 1);
+
+        for (int i = 0; i < n; i++)
+        {
+            if (wc[i].status != IBV_WC_SUCCESS)
+            {
+                fprintf(stderr, "Failed status %s (%d) for wr_id %d\n",
+                        ibv_wc_status_str(wc[i].status), wc[i].status, (int)wc[i].wr_id);
+                return 1;
+            }
+
+            if (wc[i].wr_id == wr_id)
+                finished++;
+        }
+    }
+
+    return 0;
+}
+
+int wait_completions1(int wr_id)
+{
+    int finished = 0, count = 2;
 
     while (finished < count)
     {

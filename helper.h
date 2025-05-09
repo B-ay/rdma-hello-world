@@ -17,5 +17,7 @@ int post_send(int size);
 int post_send_read(struct RemoteMR remote_mr, int size);
 int post_send_write(struct RemoteMR remote_mr, int size);
 int wait_completions(int wr_id);
+int post_recv1(int size);
+int wait_completions1(int wr_id);
 
 #endif //HELPER_H

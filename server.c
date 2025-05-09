@@ -18,10 +18,11 @@ void chat()
     struct RemoteMR remote_mr;
 
     // Get Hello World via send and receive request:
-    post_recv(BUFFER_SIZE);
-    wait_completions(RECV_WRID);
+    post_recv1(BUFFER_SIZE);
+    wait_completions1(RECV_WRID);
 
     printf(ib_res.buf);
+    // printf(ib_res.buf2);
 
     // Get remote address and rkey:
     post_recv(sizeof(struct RemoteMR));
