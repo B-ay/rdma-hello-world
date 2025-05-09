@@ -1,0 +1,1 @@
+make后服务端运行./server，客户端运行./client 服务端IP
