@@ -201,7 +201,9 @@ int setup_ib()
     memset(&ib_res, 0, sizeof(struct IBRes));
     ib_res.size = BUFFER_SIZE;
     ib_res.buf = malloc(roundup(BUFFER_SIZE, sysconf(_SC_PAGESIZE)));
-    if (!ib_res.buf) {
+    ib_res.size2 = BUFFER_SIZE;
+    ib_res.buf2 = malloc(roundup(BUFFER_SIZE, sysconf(_SC_PAGESIZE)));
+    if (!ib_res.buf || !ib_res.buf2) {
         perror("Couldn't allocate work buf.\n");
         return 1;
     }
@@ -250,7 +252,9 @@ int setup_ib()
     // Register a Memory Region:
     ib_res.mr = ibv_reg_mr(ib_res.pd, ib_res.buf, ib_res.size,
                            IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_READ | IBV_ACCESS_REMOTE_WRITE);
-    if (!ib_res.mr)
+    ib_res.mr2 = ibv_reg_mr(ib_res.pd, ib_res.buf2, ib_res.size2,
+                           IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_READ | IBV_ACCESS_REMOTE_WRITE);
+    if (!ib_res.mr || !ib_res.mr2)
     {
         perror("Couldn't register Memory Region.\n");
         return 1;

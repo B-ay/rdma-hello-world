@@ -13,12 +13,15 @@ struct IBRes {
     struct ibv_context *ctx;
     struct ibv_pd *pd;
     struct ibv_mr *mr;
+    struct ibv_mr *mr2;
     struct ibv_cq *cq;
     struct ibv_qp *qp;
     struct ibv_port_attr port_info;
 
     void *buf;
     size_t size;
+    void *buf2;
+    size_t size2;
 };
 
 struct IBDest {

@@ -14,6 +14,7 @@
 #include "helper.h"
 
 #define MSG_SEND_RECV "Hello World via send and receive!\n"
+#define MSG_SEND_RECV2 "Hello World via send and receive2!\n"
 #define MSG_READ "Hello World via RDMA Read!\n"
 #define MSG_WRITE "Hello World via RDMA Write!\n"
 
@@ -26,8 +27,9 @@ void chat()
 
     // Send Hello World via send and receive request:
     memcpy(ib_res.buf, MSG_SEND_RECV, sizeof(MSG_SEND_RECV));
-    post_send(BUFFER_SIZE);
-    wait_completions(SEND_WRID);
+    memcpy(ib_res.buf2, MSG_SEND_RECV2, sizeof(MSG_SEND_RECV2));
+    post_send1(BUFFER_SIZE);
+    wait_completions1(SEND_WRID);
 
     // Send remote address and rkey:
     memcpy(ib_res.buf, &remote_mr, sizeof(struct RemoteMR));
