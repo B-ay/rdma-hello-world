@@ -71,11 +71,11 @@ int post_send1(int size)
     struct ibv_send_wr *bad_wr;
     struct ibv_send_wr wr[2];
     wr[0].wr_id      = SEND_WRID;
-    wr[0].sg_list    = &list[0];
-    wr[0].num_sge    = 1;
+    wr[0].sg_list    = list;
+    wr[0].num_sge    = 2;
     wr[0].opcode     = IBV_WR_SEND;
     wr[0].send_flags = IBV_SEND_SIGNALED;
-    wr[0].next       = &wr[1];
+    wr[0].next       = NULL;
     wr[1].wr_id	     = SEND_WRID;
     wr[1].sg_list    = &list[1];
     wr[1].num_sge    = 1;
@@ -83,7 +83,7 @@ int post_send1(int size)
     wr[1].send_flags = IBV_SEND_SIGNALED;
     wr[1].next       = NULL;
 
-    return ibv_post_send(ib_res.qp, wr, &bad_wr);
+    return ibv_post_send(ib_res.qp, &wr[0], &bad_wr);
 }
 
 int post_send_read(struct RemoteMR remote_mr, int size)
@@ -133,9 +133,10 @@ int post_send_write(struct RemoteMR remote_mr, int size)
 int wait_completions(int wr_id)
 {
     int finished = 0, count = 1;
-
+    // printf("Waiting for completion...\n");
     while (finished < count)
     {
+        // printf("finished < count\n");
         struct ibv_wc wc[WC_BATCH];
         int n;
         do {
@@ -146,6 +147,7 @@ int wait_completions(int wr_id)
                 fprintf(stderr, "Poll CQ failed %d\n", n);
                 return 1;
             }
+            // printf("n < 1\n");
         } while (n < 1);
 
         for (int i = 0; i < n; i++)
@@ -160,6 +162,8 @@ int wait_completions(int wr_id)
             if (wc[i].wr_id == wr_id)
                 finished++;
         }
+        // printf("finished: %d\n", finished);
+        // printf("count: %d\n", count);
     }
 
     return 0;

@@ -28,8 +28,13 @@ void chat()
     // Send Hello World via send and receive request:
     memcpy(ib_res.buf, MSG_SEND_RECV, sizeof(MSG_SEND_RECV));
     memcpy(ib_res.buf2, MSG_SEND_RECV2, sizeof(MSG_SEND_RECV2));
-    post_send1(BUFFER_SIZE);
-    wait_completions1(SEND_WRID);
+    int ret = post_send1(BUFFER_SIZE);
+    // if (ret)
+    // {
+    //     fprintf(stderr, "Failed to post send.\n");
+    //     return;
+    // }
+    wait_completions(SEND_WRID);
 
     // Send remote address and rkey:
     memcpy(ib_res.buf, &remote_mr, sizeof(struct RemoteMR));
