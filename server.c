@@ -18,8 +18,13 @@ void chat()
     struct RemoteMR remote_mr;
 
     // Get Hello World via send and receive request:
-    post_recv1(BUFFER_SIZE);
-    wait_completions1(RECV_WRID);
+    int ret = post_recv1(BUFFER_SIZE);
+    // if (ret)
+    // {
+    //     fprintf(stderr, "Failed to post receive.\n");
+    //     return;
+    // }
+    wait_completions(RECV_WRID);
 
     printf(ib_res.buf);
     // printf(ib_res.buf2);

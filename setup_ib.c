@@ -276,8 +276,8 @@ int setup_ib()
                 .cap = {
                         .max_send_wr = COUNT,
                         .max_recv_wr = COUNT,
-                        .max_send_sge = 1,
-                        .max_recv_sge = 1,
+                        .max_send_sge = 2,
+                        .max_recv_sge = 2,
                 },
                 .qp_type = IBV_QPT_RC,
         };
